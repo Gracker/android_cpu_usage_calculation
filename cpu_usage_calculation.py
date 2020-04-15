@@ -6,11 +6,11 @@ import subprocess
 
 all_device_cpu_list = []
 system_server_cpu_list = []
+CPU_COUNT = 8
 
 # get cpu info
-def get_all_cpu_info(pid = 0 , device = -1):
+def get_all_cpu_info(system_server_pid = 0):
     # pid : pid of system_server , default = 0
-    # device : 0-oppo , 1-huawei
 
     all_device_total_list = []
     all_device_idle_list = []
@@ -27,7 +27,7 @@ def get_all_cpu_info(pid = 0 , device = -1):
             ## all devices cpu info get
             data = []
             #cpu_cmd = 'ssh -q -o StrictHostKeyChecking=no %s cat /proc/stat |grep -w cpu' % ip
-            cpu_cmd = "adb shell cat /proc/stat |grep -w cpu"
+            cpu_cmd = "adb shell cat /proc/stat | grep -w cpu"
 
             # res = os.popen(cpu_cmd, ).read().split()
             res = timeout_Popen(cpu_cmd, timeout=timeout_seconds)
@@ -70,18 +70,11 @@ def get_all_cpu_info(pid = 0 , device = -1):
                     except:
                         continue
 
-                if device == 0:
-                    total_cpu_time = sum([int(i) for i in system_data])
-                    system_server_total_list.append(total_cpu_time)
-                    system_server_idle_list.append(int(system_data[3]))
-                elif device == 1:
-                    total_cpu_time = sum([int(i) for i in system_data])
-                    system_server_total_list.append(total_cpu_time)
-                    system_server_idle_list.append(int(system_data[3]))
-                else:
-                    total_cpu_time = sum([int(i) for i in system_data])
-                    system_server_total_list.append(total_cpu_time)
-                    system_server_idle_list.append(int(system_data[3]))                   
+                # total_cpu_time = sum([int(i) for i in system_data])
+                system_server_total_list.append(int(res[14]) + int(res[15])+ int(res[16])+ int(res[17]))
+                print str(system_server_total_list)
+                # system_server_idle_list.append(int(system_data[3]))
+
             # slepp 5s to take
             time.sleep(5)
     except:
@@ -95,8 +88,16 @@ def get_all_cpu_info(pid = 0 , device = -1):
         
         total = total_index - all_device_total_list[index-1]
         idle = all_device_idle_list[index] - all_device_idle_list[index-1]
+        system_server_time = system_server_total_list[index] - system_server_total_list[index-1]
+
+        print "total = " + str(total)
+        print "idle = " + str(idle)
+        print "system_server_time = " + str(system_server_time)
+
         pcpu = str(round(100 * (total - idle) / total, 2))
+        sys = str(round(100 * system_server_time * CPU_COUNT / total,2 ))
         all_device_cpu_list.append(pcpu)
+        system_server_cpu_list.append(sys)
         index += 1
     return all_device_cpu_list
 
@@ -112,13 +113,19 @@ def timeout_Popen(cmd, timeout=30):
             return None
     return process
 
-# get_all_cpu_info : get cpu info , if pid is not null , get system_server cpu info either 
+# get_all_cpu_info(pid , device) : get cpu info , if pid is not null , get system_server cpu info either 
 # pid : pid of system_server , default = 0
 # device : 0-oppo , 1-huawei
-all_cpu_usages = get_all_cpu_info(1842 ,0)
+all_cpu_usages = get_all_cpu_info(1760)
 
 time_index = 0
 print "All devices cpuinfo"
 for cpu_usage in all_cpu_usages:
-    print str(time_index) + "s to " + str(time_index + 5)+ "s" + "cpu usage :" + str(cpu_usage)
+    print str(time_index) + "s to " + str(time_index + 5)+ "s" + "  cpu usage :" + str(cpu_usage)
+    time_index += 5
+
+time_index = 0
+print "SystemServer cpuinfo"
+for cpu_usage in system_server_cpu_list:
+    print str(time_index) + "s to " + str(time_index + 5)+ "s" + "  cpu usage :" + str(cpu_usage)
     time_index += 5
