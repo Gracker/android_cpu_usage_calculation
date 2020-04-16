@@ -2,6 +2,7 @@ import os
 import time
 import signal
 import subprocess
+import argparse
 
 
 all_device_cpu_list = []
@@ -50,17 +51,17 @@ def get_all_cpu_info(system_server_pid = 0):
             all_device_idle_list.append(int(data[3]))
 
             ## system server cpu info get
-            if pid > 0:
+            if int(system_server_pid) > 0:
                 system_data = []
                 #cpu_cmd = 'ssh -q -o StrictHostKeyChecking=no %s cat /proc/stat |grep -w cpu' % ip
-                cpu_cmd = "adb shell cat /proc/%d/stat" %pid
+                cpu_cmd = "adb shell cat /proc/%s/stat" %system_server_pid
 
                 res = timeout_Popen(cpu_cmd, timeout=timeout_seconds)
                 res = res.stdout.read().split()
                 print str(res)
 
                 if not res:
-                    print('ssh %s get cpu info failed')
+                    print('get cpu info failed')
                     return pcpu
 
                 for i in res:
@@ -90,10 +91,6 @@ def get_all_cpu_info(system_server_pid = 0):
         idle = all_device_idle_list[index] - all_device_idle_list[index-1]
         system_server_time = system_server_total_list[index] - system_server_total_list[index-1]
 
-        print "total = " + str(total)
-        print "idle = " + str(idle)
-        print "system_server_time = " + str(system_server_time)
-
         pcpu = str(round(100 * (total - idle) / total, 2))
         sys = str(round(100 * system_server_time * CPU_COUNT / total,2 ))
         all_device_cpu_list.append(pcpu)
@@ -113,10 +110,25 @@ def timeout_Popen(cmd, timeout=30):
             return None
     return process
 
+def getPidByName(process_name):
+    timeout_seconds = 30
+    cpu_cmd = "adb shell pidof %s" %process_name
+    res = timeout_Popen(cpu_cmd, timeout=timeout_seconds)
+    res = res.stdout.read().split()
+    print process_name + " pid =  " + str(res[0])
+    return res[0]
+
 # get_all_cpu_info(pid , device) : get cpu info , if pid is not null , get system_server cpu info either 
 # pid : pid of system_server , default = 0
 # device : 0-oppo , 1-huawei
-all_cpu_usages = get_all_cpu_info(1760)
+
+parser = argparse.ArgumentParser(description='Process cpuinfo')
+parser.add_argument('-p', '--process_name', dest='process',
+                    help='process to parse')
+args = parser.parse_args()
+
+pid = getPidByName(args.process)
+all_cpu_usages = get_all_cpu_info(pid)
 
 time_index = 0
 print "All devices cpuinfo"
@@ -124,6 +136,7 @@ for cpu_usage in all_cpu_usages:
     print str(time_index) + "s to " + str(time_index + 5)+ "s" + "  cpu usage :" + str(cpu_usage)
     time_index += 5
 
+print '------------------------'
 time_index = 0
 print "SystemServer cpuinfo"
 for cpu_usage in system_server_cpu_list:

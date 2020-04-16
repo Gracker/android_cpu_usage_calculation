@@ -90,7 +90,14 @@ cpu 使用率 = (totalProcessCpuTimeB - ，totalProcessCpuTimeA ) / (totalCpuTim
 
 # 示例
 
+
 以一段复杂的操作为例，下面可以计算出这一段时间内的整机 cpu 使用率和 SystemServer(或者其他你比较关系的进程) 的 cpu 使用率
+
+
+```
+python cpu_usage_calculation.py -p system_server
+```
+
 
 通过使用率的对比就可以分析这一段时间内的负载，可以作为竞品对比或者优化验证
 
