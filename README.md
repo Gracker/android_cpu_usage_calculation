@@ -2,9 +2,9 @@
 
 # 整机 cpu 使用率计算
 
-数据来源 ： /proc/stat （具体信息可以参考这里http://man7.org/linux/man-pages/man5/proc.5.html）
+数据来源 ： /proc/stat （具体信息可以参考这里 http://man7.org/linux/man-pages/man5/proc.5.html ）
 
-```
+```shell
 $ adb shell cat /proc/stat                                                               
 cpu  24296 3660 18105 899033 640 3576 2202 0 0 0
 cpu0 3473 285 3485 105976 58 1911 1120 0 0 0
@@ -41,11 +41,12 @@ softirq 1279600 718 431045 9410 31637 11581 0 106547 338769 0 349893
 
 ## 使用率计算
 
-取一段时间内的两份数据 ，
+取一段时间内的 两份数据  totalCpuTime 和 idle time
 
 1. totalCpuTimeA ，idleA
 2. totalCpuTimeB ，idleB
 
+计算这一段时间内的 cpu 使用率：
 
 cpu 使用率 = ((totalCpuTimeB - totalCpuTimeA) - (idleB - idleA) ) / (totalCpuTimeB - totalCpuTimeA) * 100
 
@@ -55,7 +56,7 @@ cpu 使用率 = ((totalCpuTimeB - totalCpuTimeA) - (idleB - idleA) ) / (totalCpu
 
 以华为手机 system_server 进程为例
 
-```
+```shell
 $ adb shell cat /proc/1286/stat                                                         
 1286 (system_server) S 889 889 0 0 -1 1077952832 404759 0 2760 0 9595 4059 0 0 18 -2 265 0 599 10783543296 86828 18446744073709551615 1 1 0 0 0 0 4612 0 1073794299 0 0 0 17 1 0 0 76 0 0 0 0 0 0 0 0 0 0
 ```
@@ -94,14 +95,14 @@ cpu 使用率 = (totalProcessCpuTimeB - ，totalProcessCpuTimeA ) / (totalCpuTim
 以一段复杂的操作为例，下面可以计算出这一段时间内的整机 cpu 使用率和 SystemServer(或者其他你比较关系的进程) 的 cpu 使用率
 
 
-```
+```shell
 python cpu_usage_calculation.py -p system_server
 ```
 
 
 通过使用率的对比就可以分析这一段时间内的负载，可以作为竞品对比或者优化验证
 
-```
+```shell
 All devices cpuinfo (整机 cpu 使用率)
 0s to 5s  cpu usage :98.0
 5s to 10s  cpu usage :80.0
