@@ -5,7 +5,7 @@
 数据来源 ： /proc/stat （具体信息可以参考这里 http://man7.org/linux/man-pages/man5/proc.5.html ）
 
 ```shell
-$ adb shell cat /proc/stat                                                               
+$ adb shell cat /proc/stat
 cpu  24296 3660 18105 899033 640 3576 2202 0 0 0
 cpu0 3473 285 3485 105976 58 1911 1120 0 0 0
 cpu1 3180 292 3299 110424 75 523 384 0 0 0
@@ -35,7 +35,7 @@ softirq 1279600 718 431045 9410 31637 11581 0 106547 338769 0 349893
 |idle (899033) |  从系统启动开始累计到当前时刻，除IO等待时间以外的其它等待时间 | Time spent in the idle task.  This value should be USER_HZ times the second entry in the /proc/uptime pseudo-file|
 |iowait (640)| 从系统启动开始累计到当前时刻，IO等待时间(since 2.5.41)|Time waiting for I/O to complete |
 |irq (3576)     | 从系统启动开始累计到当前时刻，硬中断时间(since 2.6.0-test4)| Time servicing interrupts|
-|softirq (2202)   |   从系统启动开始累计到当前时刻，软中断时间(since 2.6.0-test4)stealstolen(0)|Time servicing softirqs. |
+|softirq (2202)   |   从系统启动开始累计到当前时刻，软中断时间(since 2.6.0-test4)|Time servicing softirqs. |
 
 那么总的 cpu 时间 totalCpuTime = user + nice + system + idle + iowait + irq + softirq 
 
@@ -57,7 +57,7 @@ cpu 使用率 = ((totalCpuTimeB - totalCpuTimeA) - (idleB - idleA) ) / (totalCpu
 以华为手机 system_server 进程为例
 
 ```shell
-$ adb shell cat /proc/1286/stat                                                         
+$ adb shell cat /proc/1286/stat
 1286 (system_server) S 889 889 0 0 -1 1077952832 404759 0 2760 0 9595 4059 0 0 18 -2 265 0 599 10783543296 86828 18446744073709551615 1 1 0 0 0 0 4612 0 1073794299 0 0 0 17 1 0 0 76 0 0 0 0 0 0 0 0 0 0
 ```
 
@@ -96,8 +96,12 @@ cpu 使用率 = (totalProcessCpuTimeB - ，totalProcessCpuTimeA ) / (totalCpuTim
 
 
 ```shell
-python cpu_usage_calculation.py -p system_server
+python cpu_usage_calculation.py -p system_server -f 2 -t 20
 ```
+
+-p : 指定包名
+-f : 指定抓取频率(单位为 s)
+-t : 指定抓取时长(单位为 s)
 
 
 通过使用率的对比就可以分析这一段时间内的负载，可以作为竞品对比或者优化验证

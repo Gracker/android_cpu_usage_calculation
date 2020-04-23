@@ -10,7 +10,7 @@ system_server_cpu_list = []
 CPU_COUNT = 8
 
 # get cpu info
-def get_all_cpu_info(system_server_pid = 0):
+def get_all_cpu_info(system_server_pid = 0 , frequency = 5 , times = 20):
     # pid : pid of system_server , default = 0
 
     all_device_total_list = []
@@ -21,10 +21,12 @@ def get_all_cpu_info(system_server_pid = 0):
 
     pcpu = '-1'
 
-    print "get_cpuinfo start"
+    
+    range_times = int(times)/int(frequency)
+    print "get_cpuinfo start" + " times = " + str(range_times)
 
     try:
-        for k in range(5):
+        for k in range(range_times):
             ## all devices cpu info get
             data = []
             #cpu_cmd = 'ssh -q -o StrictHostKeyChecking=no %s cat /proc/stat |grep -w cpu' % ip
@@ -76,8 +78,8 @@ def get_all_cpu_info(system_server_pid = 0):
                 print str(system_server_total_list)
                 # system_server_idle_list.append(int(system_data[3]))
 
-            # slepp 5s to take
-            time.sleep(5)
+            # slepp frequency(s) to take
+            time.sleep(int(frequency))
     except:
         pass
 
@@ -111,6 +113,8 @@ def timeout_Popen(cmd, timeout=30):
     return process
 
 def getPidByName(process_name):
+    if process_name is None:
+        return 0
     timeout_seconds = 30
     cpu_cmd = "adb shell pidof %s" %process_name
     res = timeout_Popen(cpu_cmd, timeout=timeout_seconds)
@@ -125,20 +129,26 @@ def getPidByName(process_name):
 parser = argparse.ArgumentParser(description='Process cpuinfo')
 parser.add_argument('-p', '--process_name', dest='process',
                     help='process to parse')
+parser.add_argument('-f', '--frequency', dest='frequency',
+                    help='time frequency , how long to take data ') 
+parser.add_argument('-t', '--time', dest='time',
+                    help='how long') 
 args = parser.parse_args()
+freq = args.frequency
+times = args.time
 
 pid = getPidByName(args.process)
-all_cpu_usages = get_all_cpu_info(pid)
+all_cpu_usages = get_all_cpu_info(pid,freq,times)
 
 time_index = 0
 print "All devices cpuinfo"
 for cpu_usage in all_cpu_usages:
-    print str(time_index) + "s to " + str(time_index + 5)+ "s" + "  cpu usage :" + str(cpu_usage)
-    time_index += 5
+    print str(time_index) + "s to " + str(time_index + int(freq))+ "s" + "  cpu usage :" + str(cpu_usage)
+    time_index += int(freq)
 
 print '------------------------'
 time_index = 0
 print "SystemServer cpuinfo"
 for cpu_usage in system_server_cpu_list:
-    print str(time_index) + "s to " + str(time_index + 5)+ "s" + "  cpu usage :" + str(cpu_usage)
-    time_index += 5
+    print str(time_index) + "s to " + str(time_index + int(freq))+ "s" + "  cpu usage :" + str(cpu_usage)
+    time_index += int(freq)
