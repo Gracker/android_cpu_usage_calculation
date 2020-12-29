@@ -23,7 +23,7 @@ def get_all_cpu_info(system_server_pid = 0 , frequency = 5 , times = 20):
 
     
     range_times = int(times)/int(frequency)
-    print("get_cpuinfo start" + " times = " + str(range_times))
+    print "get_cpuinfo start" + " times = " + str(range_times)
 
     try:
         for k in range(range_times):
@@ -35,7 +35,7 @@ def get_all_cpu_info(system_server_pid = 0 , frequency = 5 , times = 20):
             # res = os.popen(cpu_cmd, ).read().split()
             res = timeout_Popen(cpu_cmd, timeout=timeout_seconds)
             res = res.stdout.read().split()
-            print(str(res))
+            print str(res)
 
             if not res:
                 print('ssh %s get cpu info failed')
@@ -60,7 +60,7 @@ def get_all_cpu_info(system_server_pid = 0 , frequency = 5 , times = 20):
 
                 res = timeout_Popen(cpu_cmd, timeout=timeout_seconds)
                 res = res.stdout.read().split()
-                print(str(res))
+                print str(res)
 
                 if not res:
                     print('get cpu info failed')
@@ -75,7 +75,7 @@ def get_all_cpu_info(system_server_pid = 0 , frequency = 5 , times = 20):
 
                 # total_cpu_time = sum([int(i) for i in system_data])
                 system_server_total_list.append(int(res[14]) + int(res[15])+ int(res[16])+ int(res[17]))
-                print(str(system_server_total_list))
+                print str(system_server_total_list)
                 # system_server_idle_list.append(int(system_data[3]))
 
             # slepp frequency(s) to take
@@ -119,7 +119,7 @@ def getPidByName(process_name):
     cpu_cmd = "adb shell pidof %s" %process_name
     res = timeout_Popen(cpu_cmd, timeout=timeout_seconds)
     res = res.stdout.read().split()
-    print(process_name + " pid =  " + str(res[0]))
+    print process_name + " pid =  " + str(res[0])
     return res[0]
 
 # get_all_cpu_info(pid , device) : get cpu info , if pid is not null , get system_server cpu info either 
@@ -141,14 +141,14 @@ pid = getPidByName(args.process)
 all_cpu_usages = get_all_cpu_info(pid,freq,times)
 
 time_index = 0
-print("All devices cpuinfo")
+print "All devices cpuinfo"
 for cpu_usage in all_cpu_usages:
-    print(str(time_index) + "s to " + str(time_index + int(freq))+ "s" + "  cpu usage :" + str(cpu_usage))
+    print str(time_index) + "s to " + str(time_index + int(freq))+ "s" + "  cpu usage :" + str(cpu_usage)
     time_index += int(freq)
 
-print('------------------------')
+print '------------------------'
 time_index = 0
-print("SystemServer cpuinfo")
+print "SystemServer cpuinfo"
 for cpu_usage in system_server_cpu_list:
-    print(str(time_index) + "s to " + str(time_index + int(freq))+ "s" + "  cpu usage :" + str(cpu_usage))
+    print str(time_index) + "s to " + str(time_index + int(freq))+ "s" + "  cpu usage :" + str(cpu_usage)
     time_index += int(freq)
