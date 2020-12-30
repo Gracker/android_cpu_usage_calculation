@@ -26,12 +26,12 @@ def get_all_cpu_info(system_server_pid = 0 , frequency = 5 , times = 20):
     print("get_cpuinfo start" + " times = " + str(range_times))
 
     try:
-        for k in range(range_times):
+        for k in range(int(range_times)):
             ## all devices cpu info get
             data = []
             #cpu_cmd = 'ssh -q -o StrictHostKeyChecking=no %s cat /proc/stat |grep -w cpu' % ip
             cpu_cmd = "adb shell cat /proc/stat | grep -w cpu"
-
+            print(cpu_cmd)
             # res = os.popen(cpu_cmd, ).read().split()
             res = timeout_Popen(cpu_cmd, timeout=timeout_seconds)
             res = res.stdout.read().split()
@@ -117,10 +117,11 @@ def getPidByName(process_name):
         return 0
     timeout_seconds = 30
     cpu_cmd = "adb shell pidof %s" %process_name
+    
     res = timeout_Popen(cpu_cmd, timeout=timeout_seconds)
     res = res.stdout.read().split()
-    print(process_name + " pid =  " + str(res[0]))
-    return res[0]
+    print(process_name + " pid =  " + str(res[0].decode('ascii')))
+    return res[0].decode('ascii')
 
 # get_all_cpu_info(pid , device) : get cpu info , if pid is not null , get system_server cpu info either 
 # pid : pid of system_server , default = 0
