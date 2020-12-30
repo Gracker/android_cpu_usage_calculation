@@ -127,6 +127,7 @@ def getPidByName(process_name):
     print(process_name + " pid =  " + str(res[0]))
     return res[0]
 
+
 # get_all_cpu_info(pid , device) : get cpu info , if pid is not null , get system_server cpu info either
 # pid : pid of system_server , default = 0
 # device : 0-oppo , 1-huawei
