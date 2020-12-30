@@ -29,16 +29,13 @@ def get_all_cpu_info(system_server_pid = 0 , frequency = 5 , times = 20):
         for k in range(int(range_times)):
             ## all devices cpu info get
             data = []
-            #cpu_cmd = 'ssh -q -o StrictHostKeyChecking=no %s cat /proc/stat |grep -w cpu' % ip
-            cpu_cmd = "adb shell cat /proc/stat | grep -w cpu"
-            print(cpu_cmd)
-            # res = os.popen(cpu_cmd, ).read().split()
+            cpu_cmd = 'adb shell "cat /proc/stat | grep -w cpu"'
             res = timeout_Popen(cpu_cmd, timeout=timeout_seconds)
             res = res.stdout.read().split()
             print(str(res))
 
             if not res:
-                print('ssh %s get cpu info failed')
+                print('ssh %s get cpu info failed , Please check if the adb environment is configured')
                 return pcpu
 
             for i in res:
@@ -55,15 +52,14 @@ def get_all_cpu_info(system_server_pid = 0 , frequency = 5 , times = 20):
             ## system server cpu info get
             if int(system_server_pid) > 0:
                 system_data = []
-                #cpu_cmd = 'ssh -q -o StrictHostKeyChecking=no %s cat /proc/stat |grep -w cpu' % ip
-                cpu_cmd = "adb shell cat /proc/%s/stat" %system_server_pid
+                cpu_cmd = 'adb shell "cat /proc/%s/stat"' %system_server_pid
 
                 res = timeout_Popen(cpu_cmd, timeout=timeout_seconds)
                 res = res.stdout.read().split()
                 print(str(res))
 
                 if not res:
-                    print('get cpu info failed')
+                    print('get cpu info failed, Please check if the adb environment is configured')
                     return pcpu
 
                 for i in res:
@@ -73,10 +69,8 @@ def get_all_cpu_info(system_server_pid = 0 , frequency = 5 , times = 20):
                     except:
                         continue
 
-                # total_cpu_time = sum([int(i) for i in system_data])
                 system_server_total_list.append(int(res[14]) + int(res[15])+ int(res[16])+ int(res[17]))
                 print(str(system_server_total_list))
-                # system_server_idle_list.append(int(system_data[3]))
 
             # slepp frequency(s) to take
             time.sleep(int(frequency))
